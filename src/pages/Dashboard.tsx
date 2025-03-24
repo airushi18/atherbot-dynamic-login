@@ -1,170 +1,405 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Plus, Upload, Key, FileText } from 'lucide-react';
-import DashboardLayout from '@/components/DashboardLayout';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Bot, Copy, Eye, EyeOff, Key, Plus, RefreshCw, Shield, Trash2, Upload } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Progress } from "@/components/ui/progress";
+import { toast } from "@/components/ui/sonner";
+
+const apiKeys = [
+  { id: "key_1", name: "Production API Key", key: "sk_prod_2eF9dKlGh56jKlMn7zX8vB4c5D6eF7gH", createdAt: "2023-06-15T10:30:00Z", lastUsed: "2023-08-20T14:45:20Z" },
+  { id: "key_2", name: "Development API Key", key: "sk_dev_8gF7dHeL56mKnJ9pQ1rS2tU3vW4xY5zZ", createdAt: "2023-07-22T08:15:30Z", lastUsed: "2023-08-19T11:20:10Z" },
+  { id: "key_3", name: "Testing API Key", key: "sk_test_3jK4lMnO5pQrS6tUvW7xYzA1bC2dE3fG", createdAt: "2023-08-05T16:40:00Z", lastUsed: "2023-08-18T09:10:45Z" },
+];
+
+const knowledgeBase = [
+  { id: "kb_1", name: "Product Documentation", size: "2.4 MB", format: "PDF", status: "processed", uploadDate: "2023-07-10T09:20:30Z" },
+  { id: "kb_2", name: "Customer FAQ", size: "1.1 MB", format: "DOCX", status: "processing", uploadDate: "2023-08-18T14:30:10Z" },
+  { id: "kb_3", name: "Technical Specifications", size: "5.7 MB", format: "PDF", status: "processed", uploadDate: "2023-08-15T11:45:20Z" },
+  { id: "kb_4", name: "User Manuals", size: "8.2 MB", format: "PDF", status: "error", uploadDate: "2023-08-17T16:15:40Z" },
+];
 
 const Dashboard = () => {
-  // Dummy data
-  const apiKeys = [
-    { id: 1, name: 'Production Key', key: 'ather_prod_1234567890', createdAt: '2023-05-15' },
-    { id: 2, name: 'Development Key', key: 'ather_dev_0987654321', createdAt: '2023-06-01' },
-  ];
-  
-  const knowledgeFiles = [
-    { id: 1, name: 'Product Documentation.pdf', size: '2.4 MB', uploadedAt: '2023-05-20' },
-    { id: 2, name: 'FAQ Database.json', size: '1.8 MB', uploadedAt: '2023-06-05' },
-    { id: 3, name: 'Customer Queries.csv', size: '3.2 MB', uploadedAt: '2023-06-15' },
-  ];
-  
+  const [showKey, setShowKey] = useState<Record<string, boolean>>({});
+  const [selectedTab, setSelectedTab] = useState("overview");
+
+  const toggleKeyVisibility = (keyId: string) => {
+    setShowKey(prev => ({ ...prev, [keyId]: !prev[keyId] }));
+  };
+
+  const copyApiKey = (key: string) => {
+    navigator.clipboard.writeText(key);
+    toast.success("API key copied to clipboard");
+  };
+
+  const handleDeleteKey = (keyId: string) => {
+    // This would be where you'd call your API to delete the key
+    console.log(`Delete key ${keyId}`);
+    toast.success("API key has been deleted");
+  };
+
+  const handleUploadFile = () => {
+    // This would handle the file upload
+    console.log("File would be uploaded here");
+    toast.success("File uploaded successfully");
+  };
+
+  const handleCreateApiKey = () => {
+    // This would create a new API key
+    console.log("New API key would be created here");
+    toast.success("New API key has been created");
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'processed':
+        return <Badge className="bg-green-500">Processed</Badge>;
+      case 'processing':
+        return <Badge className="bg-blue-500">Processing</Badge>;
+      case 'error':
+        return <Badge className="bg-red-500">Error</Badge>;
+      default:
+        return <Badge>Unknown</Badge>;
+    }
+  };
+
   return (
     <DashboardLayout>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-atherbot-dark mb-2">Dashboard</h1>
-        <p className="text-atherbot-gray">Welcome to your Ather Bot dashboard</p>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* API Keys Section */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <div>
-              <CardTitle>API Keys</CardTitle>
-              <CardDescription>
-                Your generated API keys for integration
-              </CardDescription>
-            </div>
-            <Button size="sm" variant="outline" className="gap-1">
-              <Key className="h-4 w-4" />
-              <span>Manage Keys</span>
+      <div className="flex-1 space-y-4 p-8 pt-6">
+        <div className="flex items-center justify-between space-y-2">
+          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+          <div className="flex items-center space-x-2">
+            <Button variant="outline">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Refresh
             </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {apiKeys.map((item) => (
-                <div 
-                  key={item.id} 
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
-                >
-                  <div>
-                    <div className="font-medium text-atherbot-dark">{item.name}</div>
-                    <div className="text-sm text-atherbot-gray">Created on {item.createdAt}</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="px-3 py-1 bg-atherbot-blue/10 text-atherbot-blue text-xs rounded-full font-medium">
-                      {item.key.substring(0, 10)}...
-                    </div>
-                    <Button variant="ghost" size="icon" title="Copy Key">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                    </Button>
-                  </div>
-                </div>
-              ))}
-              
-              <Button className="w-full gap-1">
-                <Plus className="h-4 w-4" />
-                <span>Generate New API Key</span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Knowledge Base Section */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <div>
-              <CardTitle>Knowledge Base</CardTitle>
-              <CardDescription>
-                Your uploaded files for AI training
-              </CardDescription>
-            </div>
-            <Button size="sm" variant="outline" className="gap-1">
-              <FileText className="h-4 w-4" />
-              <span>View All</span>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {knowledgeFiles.map((file) => (
-                <div 
-                  key={file.id} 
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-md bg-atherbot-blue/10 flex items-center justify-center text-atherbot-blue">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="font-medium text-atherbot-dark">{file.name}</div>
-                      <div className="text-sm text-atherbot-gray">{file.size} • Uploaded on {file.uploadedAt}</div>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="icon" title="Remove File">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </Button>
-                </div>
-              ))}
-              
-              <Button className="w-full gap-1">
-                <Upload className="h-4 w-4" />
-                <span>Upload New File</span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Quick Actions */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold text-atherbot-dark mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Button variant="outline" className="h-auto py-6 flex flex-col items-center justify-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-atherbot-blue/10 flex items-center justify-center text-atherbot-blue">
-              <Key className="h-6 w-6" />
-            </div>
-            <div className="text-center">
-              <div className="font-medium">Generate API Key</div>
-              <div className="text-sm text-atherbot-gray">Create new API credentials</div>
-            </div>
-          </Button>
-          
-          <Button variant="outline" className="h-auto py-6 flex flex-col items-center justify-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
-              <Upload className="h-6 w-6" />
-            </div>
-            <div className="text-center">
-              <div className="font-medium">Upload Data</div>
-              <div className="text-sm text-atherbot-gray">Add files to knowledge base</div>
-            </div>
-          </Button>
-          
-          <Button variant="outline" className="h-auto py-6 flex flex-col items-center justify-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-              <FileText className="h-6 w-6" />
-            </div>
-            <div className="text-center">
-              <div className="font-medium">Read Docs</div>
-              <div className="text-sm text-atherbot-gray">Learn API integration</div>
-            </div>
-          </Button>
-          
-          <Button variant="outline" className="h-auto py-6 flex flex-col items-center justify-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-              <Settings className="h-6 w-6" />
-            </div>
-            <div className="text-center">
-              <div className="font-medium">Setup Profile</div>
-              <div className="text-sm text-atherbot-gray">Update account settings</div>
-            </div>
-          </Button>
+          </div>
         </div>
+        
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="api-keys">API Keys</TabsTrigger>
+            <TabsTrigger value="knowledge-base">Knowledge Base</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total API Calls</CardTitle>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    className="h-4 w-4 text-muted-foreground"
+                  >
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                  </svg>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">2,345</div>
+                  <p className="text-xs text-muted-foreground">
+                    +12.5% from last month
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Active API Keys
+                  </CardTitle>
+                  <Key className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">3</div>
+                  <p className="text-xs text-muted-foreground">
+                    +1 created this month
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Knowledge Base Files</CardTitle>
+                  <Upload className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">4</div>
+                  <p className="text-xs text-muted-foreground">
+                    17.4 MB total size
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+              <Card className="col-span-1">
+                <CardHeader>
+                  <CardTitle>Recent API Calls</CardTitle>
+                  <CardDescription>Your recent API activity</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center">
+                      <div className="ml-4 space-y-1">
+                        <p className="text-sm font-medium leading-none">GET /api/v1/chat/completions</p>
+                        <p className="text-sm text-muted-foreground">Today at 2:34 PM</p>
+                      </div>
+                      <div className="ml-auto font-medium">200 OK</div>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="ml-4 space-y-1">
+                        <p className="text-sm font-medium leading-none">POST /api/v1/embeddings</p>
+                        <p className="text-sm text-muted-foreground">Today at 1:15 PM</p>
+                      </div>
+                      <div className="ml-auto font-medium">200 OK</div>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="ml-4 space-y-1">
+                        <p className="text-sm font-medium leading-none">GET /api/v1/models</p>
+                        <p className="text-sm text-muted-foreground">Today at 11:42 AM</p>
+                      </div>
+                      <div className="ml-auto font-medium">200 OK</div>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="ml-4 space-y-1">
+                        <p className="text-sm font-medium leading-none">POST /api/v1/chat/completions</p>
+                        <p className="text-sm text-muted-foreground">Yesterday at 4:30 PM</p>
+                      </div>
+                      <div className="ml-auto font-medium">200 OK</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="col-span-1">
+                <CardHeader>
+                  <CardTitle>API Usage</CardTitle>
+                  <CardDescription>Your API usage for this month</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center">
+                          <Bot className="h-4 w-4 mr-2" />
+                          <span>Chat Completions</span>
+                        </div>
+                        <span>1,245 / 5,000</span>
+                      </div>
+                      <Progress value={25} />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center">
+                          <Shield className="h-4 w-4 mr-2" />
+                          <span>Embeddings</span>
+                        </div>
+                        <span>890 / 10,000</span>
+                      </div>
+                      <Progress value={9} />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center">
+                          <Bot className="h-4 w-4 mr-2" />
+                          <span>Knowledge Base Queries</span>
+                        </div>
+                        <span>210 / 1,000</span>
+                      </div>
+                      <Progress value={21} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="api-keys" className="space-y-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>API Keys</CardTitle>
+                  <CardDescription>Manage your API keys</CardDescription>
+                </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create API Key
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Create New API Key</DialogTitle>
+                      <DialogDescription>
+                        Create a new API key to authenticate your API requests.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="key-name" className="text-right">
+                          Key Name
+                        </Label>
+                        <Input
+                          id="key-name"
+                          placeholder="e.g. Production API Key"
+                          className="col-span-3"
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button onClick={handleCreateApiKey}>Create Key</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[400px]">
+                  <div className="space-y-4">
+                    {apiKeys.map((apiKey) => (
+                      <div key={apiKey.id} className="rounded-lg border p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="font-medium">{apiKey.name}</h3>
+                            <div className="mt-1 flex items-center">
+                              <div className="text-sm text-muted-foreground font-mono flex items-center max-w-[300px] overflow-hidden">
+                                {showKey[apiKey.id] ? (
+                                  apiKey.key
+                                ) : (
+                                  `${apiKey.key.substring(0, 8)}...${apiKey.key.substring(apiKey.key.length - 4)}`
+                                )}
+                              </div>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => toggleKeyVisibility(apiKey.id)}
+                                className="ml-2"
+                              >
+                                {showKey[apiKey.id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => copyApiKey(apiKey.key)}
+                                className="ml-2"
+                              >
+                                <Copy className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            <div className="mt-1 text-xs text-muted-foreground">
+                              Created: {formatDate(apiKey.createdAt)} • Last used: {formatDate(apiKey.lastUsed)}
+                            </div>
+                          </div>
+                          <Button 
+                            variant="destructive" 
+                            size="icon"
+                            onClick={() => handleDeleteKey(apiKey.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="knowledge-base" className="space-y-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Knowledge Base</CardTitle>
+                  <CardDescription>Train your AI on your own data</CardDescription>
+                </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Upload className="mr-2 h-4 w-4" />
+                      Upload Files
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Upload Knowledge Base Files</DialogTitle>
+                      <DialogDescription>
+                        Upload documents to train your AI model.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="file-upload">Select files</Label>
+                        <Input id="file-upload" type="file" multiple />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button onClick={handleUploadFile}>Upload</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[400px]">
+                  <div className="space-y-4">
+                    {knowledgeBase.map((file) => (
+                      <div key={file.id} className="rounded-lg border p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="font-medium">{file.name}</h3>
+                            <div className="mt-1 flex items-center">
+                              <Badge variant="outline">{file.format}</Badge>
+                              <span className="ml-2 text-xs text-muted-foreground">{file.size}</span>
+                              <div className="ml-2">
+                                {getStatusBadge(file.status)}
+                              </div>
+                            </div>
+                            <div className="mt-1 text-xs text-muted-foreground">
+                              Uploaded: {formatDate(file.uploadDate)}
+                            </div>
+                          </div>
+                          <Button 
+                            variant="destructive" 
+                            size="icon"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </DashboardLayout>
   );

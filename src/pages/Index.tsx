@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,7 @@ import { Bot, Zap, Shield, Database, ArrowRight } from 'lucide-react';
 import AnimatedBackground from "@/components/AnimatedBackground";
 import FloatingElements from "@/components/FloatingElements";
 import Header from "@/components/Header";
+import RobotIllustration from "@/components/RobotIllustration";
 
 const FeatureCard = ({ icon: Icon, title, description }) => (
   <div className="relative p-6 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 hover:border-atherbot-blue/30 transition-all duration-300 hover:shadow-lg hover:shadow-atherbot-blue/5 group">
@@ -133,11 +133,7 @@ const Home = () => {
             <div className="w-full lg:w-1/2 animate-fade-in-right" style={{ animationDelay: '0.4s' }}>
               <div className="relative">
                 <div className="absolute -inset-4 bg-atherbot-blue/10 rounded-full blur-3xl animate-pulse-slow opacity-70"></div>
-                <img 
-                  src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
-                  alt="Ather Bot" 
-                  className="relative z-10 w-full h-auto rounded-lg object-cover"
-                />
+                <RobotIllustration />
               </div>
             </div>
           </div>
