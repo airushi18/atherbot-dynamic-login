@@ -12,211 +12,227 @@ const RobotIllustration: React.FC = () => {
         xmlns="http://www.w3.org/2000/svg"
         className="drop-shadow-xl"
       >
-        {/* Robot Head - more angular, professional look */}
-        <path 
-          d="M150,60 L350,60 L350,220 L150,220 Z" 
-          stroke="#0071e3" 
-          strokeWidth="2" 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-          fill="none" 
-        />
-        
-        {/* Robot Panel Lines - more technical look */}
-        <line 
-          x1="150" 
-          y1="90" 
-          x2="350" 
-          y2="90" 
-          stroke="#0071e3" 
-          strokeWidth="1" 
-          strokeDasharray="4 4" 
-        />
-        <line 
-          x1="150" 
-          y1="180" 
-          x2="350" 
-          y2="180" 
-          stroke="#0071e3" 
-          strokeWidth="1" 
-          strokeDasharray="4 4" 
-        />
-        
-        {/* Robot Eyes - sleeker look */}
+        {/* Robot Head */}
         <rect 
-          x="180" 
-          y="110" 
-          width="40" 
-          height="10" 
-          rx="2" 
-          fill="#0071e3" 
-        />
-        <rect 
-          x="280" 
-          y1="110" 
-          width="40" 
-          height="10" 
-          rx="2" 
-          fill="#0071e3" 
+          x="165" 
+          y="80" 
+          width="170" 
+          height="140" 
+          rx="15" 
+          fill="white" 
+          stroke="#0071e3" 
+          strokeWidth="2"
         />
         
-        {/* Robot Mouth - more mechanical */}
+        {/* Robot Face */}
         <rect 
           x="200" 
-          y="150" 
-          width="100" 
-          height="4" 
-          rx="2" 
+          y="110" 
+          width="40" 
+          height="20" 
+          rx="5" 
           fill="#0071e3" 
+          fillOpacity="0.7"
         />
-        <line 
-          x1="210" 
-          y1="160" 
-          x2="290" 
-          y2="160" 
+        <rect 
+          x="260" 
+          y="110" 
+          width="40" 
+          height="20" 
+          rx="5" 
+          fill="#0071e3" 
+          fillOpacity="0.7"
+        />
+        
+        {/* Robot Smile */}
+        <path 
+          d="M215,160 Q250,180 285,160" 
           stroke="#0071e3" 
-          strokeWidth="1" 
-          strokeLinecap="round" 
-          strokeDasharray="5 3" 
+          strokeWidth="3" 
+          fill="none" 
+          strokeLinecap="round"
         />
         
         {/* Robot Antenna */}
-        <path 
-          d="M250,60 L250,30 L255,25 L245,20 L255,15 L245,10 L250,5" 
-          stroke="#0071e3" 
-          strokeWidth="2" 
-          strokeLinecap="round" 
-          fill="none" 
+        <path
+          d="M250,80 L250,60 L240,50 L260,40 L240,30 L250,20"
+          stroke="#0071e3"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
         />
+        <circle cx="250" cy="15" r="5" fill="#0071e3" />
         
-        {/* Robot Body - more structured */}
-        <path 
-          d="M170,220 L330,220 L340,340 L160,340 Z" 
-          stroke="#0071e3" 
-          strokeWidth="2" 
-          fill="none" 
-        />
-        
-        {/* Robot Body Features */}
+        {/* Robot Neck */}
         <rect 
-          x="210" 
+          x="220" 
+          y="220" 
+          width="60" 
+          height="20" 
+          fill="white" 
+          stroke="#0071e3" 
+          strokeWidth="2"
+        />
+        
+        {/* Robot Body */}
+        <rect 
+          x="165" 
           y="240" 
-          width="80" 
-          height="30" 
-          rx="2" 
+          width="170" 
+          height="120" 
+          rx="10" 
+          fill="white" 
           stroke="#0071e3" 
-          strokeWidth="1" 
-          fill="none" 
-        />
-        <circle 
-          cx="230" 
-          cy="255" 
-          r="5" 
-          fill="#0071e3" 
-          fillOpacity="0.6" 
-        />
-        <circle 
-          cx="250" 
-          cy="255" 
-          r="5" 
-          fill="#0071e3" 
-          fillOpacity="0.6" 
-        />
-        <circle 
-          cx="270" 
-          cy="255" 
-          r="5" 
-          fill="#0071e3" 
-          fillOpacity="0.6" 
+          strokeWidth="2"
         />
         
-        {/* Digital Circuit Lines */}
+        {/* Robot Control Panel */}
+        <rect 
+          x="200" 
+          y="260" 
+          width="100" 
+          height="60" 
+          rx="5" 
+          fill="white" 
+          stroke="#0071e3" 
+          strokeWidth="1"
+        />
+        
+        {/* Control Panel Details */}
+        <circle cx="220" cy="280" r="6" fill="#0071e3" fillOpacity="0.6" />
+        <circle cx="250" cy="280" r="6" fill="#0071e3" fillOpacity="0.6" />
+        <circle cx="280" cy="280" r="6" fill="#0071e3" fillOpacity="0.6" />
+        
+        <rect x="210" y="300" width="80" height="10" rx="2" fill="#0071e3" fillOpacity="0.4" />
+        
+        {/* Robot Left Arm (at rest) */}
         <path 
-          d="M190,290 L210,290 L210,310 L230,310 L230,290 L250,290" 
+          d="M165,260 L130,260 L130,320 L150,320" 
+          stroke="#0071e3" 
+          strokeWidth="2" 
+          fill="none"
+        />
+        <rect 
+          x="120" 
+          y="260" 
+          width="20" 
+          height="60" 
+          rx="5" 
+          fill="white" 
+          stroke="#0071e3" 
+          strokeWidth="2"
+        />
+        <circle cx="130" cy="260" r="5" fill="#0071e3" fillOpacity="0.4" />
+        
+        {/* Robot Right Arm (waving) */}
+        <path 
+          d="M335,260 L370,230 L390,180 L380,170" 
+          stroke="#0071e3" 
+          strokeWidth="2" 
+          fill="none"
+        />
+        <rect 
+          x="370" 
+          y="170" 
+          width="20" 
+          height="60" 
+          rx="5" 
+          fill="white" 
+          stroke="#0071e3" 
+          strokeWidth="2"
+          transform="rotate(-30, 370, 170)"
+        />
+        <circle cx="370" cy="230" r="5" fill="#0071e3" fillOpacity="0.4" />
+        
+        {/* Robot Hand (waving) */}
+        <path 
+          d="M390,180 L410,170 L405,160 L415,155 L410,145" 
+          stroke="#0071e3" 
+          strokeWidth="2" 
+          fill="none"
+          strokeLinecap="round"
+        />
+        
+        {/* "Hi!" Text */}
+        <text 
+          x="415" 
+          y="130" 
+          fontFamily="Arial" 
+          fontSize="20" 
+          fontWeight="bold" 
+          fill="#0071e3"
+        >
+          Hi!
+        </text>
+        
+        {/* Robot Legs */}
+        <rect 
+          x="190" 
+          y="360" 
+          width="30" 
+          height="40" 
+          rx="5" 
+          fill="white" 
+          stroke="#0071e3" 
+          strokeWidth="2"
+        />
+        <rect 
+          x="280" 
+          y="360" 
+          width="30" 
+          height="40" 
+          rx="5" 
+          fill="white" 
+          stroke="#0071e3" 
+          strokeWidth="2"
+        />
+        
+        {/* Robot Feet */}
+        <rect 
+          x="180" 
+          y="390" 
+          width="50" 
+          height="10" 
+          rx="5" 
+          fill="white" 
+          stroke="#0071e3" 
+          strokeWidth="2"
+        />
+        <rect 
+          x="270" 
+          y="390" 
+          width="50" 
+          height="10" 
+          rx="5" 
+          fill="white" 
+          stroke="#0071e3" 
+          strokeWidth="2"
+        />
+        
+        {/* Circuit Pattern Details */}
+        <path 
+          d="M180,330 L190,330 L190,340 L200,340" 
           stroke="#0071e3" 
           strokeWidth="1" 
-          strokeLinecap="round" 
-          fill="none" 
+          strokeDasharray="2 2" 
+          fill="none"
         />
         <path 
-          d="M270,290 L290,290 L290,310 L310,310" 
+          d="M300,330 L310,330 L310,340 L320,340" 
           stroke="#0071e3" 
           strokeWidth="1" 
-          strokeLinecap="round" 
-          fill="none" 
+          strokeDasharray="2 2" 
+          fill="none"
         />
         
-        {/* Circuit Points */}
-        <circle cx="210" cy="290" r="2" fill="#0071e3" />
-        <circle cx="230" cy="290" r="2" fill="#0071e3" />
-        <circle cx="230" cy="310" r="2" fill="#0071e3" />
-        <circle cx="250" cy="290" r="2" fill="#0071e3" />
-        <circle cx="270" cy="290" r="2" fill="#0071e3" />
-        <circle cx="290" cy="290" r="2" fill="#0071e3" />
-        <circle cx="290" cy="310" r="2" fill="#0071e3" />
-        <circle cx="310" cy="310" r="2" fill="#0071e3" />
-        
-        {/* Technical Pencil - more elegant, less cartoonish */}
-        <g transform="translate(350, 150) rotate(30)">
-          <rect 
-            x="0" 
-            y="0" 
-            width="10" 
-            height="150" 
-            fill="#0071e3" 
-            fillOpacity="0.1" 
-            stroke="#0071e3" 
-            strokeWidth="1" 
-          />
-          <polygon 
-            points="0,0 10,0 5,-15" 
-            fill="#0071e3" 
-            stroke="#0071e3" 
-            strokeWidth="1" 
-          />
-          <rect 
-            x="0" 
-            y="10" 
-            width="10" 
-            height="15" 
-            fill="#0071e3" 
-            fillOpacity="0.3" 
-            stroke="#0071e3" 
-            strokeWidth="1" 
-          />
-        </g>
-        
-        {/* Technical Blueprint Lines */}
-        <line 
-          x1="120" 
-          y1="60" 
-          x2="120" 
-          y2="340" 
-          stroke="#0071e3" 
-          strokeWidth="0.5" 
-          strokeDasharray="5 5" 
-          opacity="0.4" 
-        />
-        <line 
-          x1="380" 
-          y1="60" 
-          x2="380" 
-          y2="340" 
-          stroke="#0071e3" 
-          strokeWidth="0.5" 
-          strokeDasharray="5 5" 
-          opacity="0.4" 
-        />
-        <line 
-          x1="150" 
-          y1="380" 
-          x2="350" 
-          y2="380" 
-          stroke="#0071e3" 
-          strokeWidth="0.5" 
-          strokeDasharray="5 5" 
-          opacity="0.4" 
-        />
+        {/* Technical Details */}
+        <circle cx="190" cy="330" r="2" fill="#0071e3" />
+        <circle cx="190" cy="340" r="2" fill="#0071e3" />
+        <circle cx="200" cy="340" r="2" fill="#0071e3" />
+        <circle cx="300" cy="330" r="2" fill="#0071e3" />
+        <circle cx="310" cy="330" r="2" fill="#0071e3" />
+        <circle cx="310" cy="340" r="2" fill="#0071e3" />
+        <circle cx="320" cy="340" r="2" fill="#0071e3" />
       </svg>
     </div>
   );
