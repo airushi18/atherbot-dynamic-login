@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Bot } from 'lucide-react';
+import { Bot, Settings } from 'lucide-react';
 
 const Header: React.FC = () => {
   return (
@@ -19,6 +19,9 @@ const Header: React.FC = () => {
           </Link>
           <Link to="/api" className="text-atherbot-gray hover:text-atherbot-dark transition-colors">
             API
+          </Link>
+          <Link to="/settings" className="text-atherbot-gray hover:text-atherbot-dark transition-colors">
+            <Settings className="h-5 w-5" />
           </Link>
           <Link to="/login">
             <Button variant="outline" className="mr-2">Login</Button>

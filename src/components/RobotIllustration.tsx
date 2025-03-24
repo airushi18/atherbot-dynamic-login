@@ -12,187 +12,210 @@ const RobotIllustration: React.FC = () => {
         xmlns="http://www.w3.org/2000/svg"
         className="drop-shadow-xl"
       >
-        {/* Robot Head */}
-        <rect 
-          x="150" 
-          y="60" 
-          width="200" 
-          height="160" 
-          rx="20" 
+        {/* Robot Head - more angular, professional look */}
+        <path 
+          d="M150,60 L350,60 L350,220 L150,220 Z" 
           stroke="#0071e3" 
-          strokeWidth="3" 
+          strokeWidth="2" 
           strokeLinecap="round" 
           strokeLinejoin="round" 
-          strokeDasharray="2 6" 
           fill="none" 
         />
         
-        {/* Robot Eyes */}
-        <circle 
-          cx="200" 
-          cy="120" 
-          r="25" 
+        {/* Robot Panel Lines - more technical look */}
+        <line 
+          x1="150" 
+          y1="90" 
+          x2="350" 
+          y2="90" 
           stroke="#0071e3" 
-          strokeWidth="3" 
-          fill="white" 
-          fillOpacity="0.2" 
+          strokeWidth="1" 
+          strokeDasharray="4 4" 
         />
-        <circle 
-          cx="300" 
-          cy="120" 
-          r="25" 
+        <line 
+          x1="150" 
+          y1="180" 
+          x2="350" 
+          y2="180" 
           stroke="#0071e3" 
-          strokeWidth="3" 
-          fill="white" 
-          fillOpacity="0.2" 
+          strokeWidth="1" 
+          strokeDasharray="4 4" 
         />
         
-        {/* Robot Pupils */}
-        <circle 
-          cx="200" 
-          cy="120" 
-          r="10" 
+        {/* Robot Eyes - sleeker look */}
+        <rect 
+          x="180" 
+          y="110" 
+          width="40" 
+          height="10" 
+          rx="2" 
           fill="#0071e3" 
         />
-        <circle 
-          cx="300" 
-          cy="120" 
-          r="10" 
+        <rect 
+          x="280" 
+          y1="110" 
+          width="40" 
+          height="10" 
+          rx="2" 
           fill="#0071e3" 
         />
         
-        {/* Robot Mouth */}
-        <path 
-          d="M190 170 Q250 200 310 170" 
+        {/* Robot Mouth - more mechanical */}
+        <rect 
+          x="200" 
+          y="150" 
+          width="100" 
+          height="4" 
+          rx="2" 
+          fill="#0071e3" 
+        />
+        <line 
+          x1="210" 
+          y1="160" 
+          x2="290" 
+          y2="160" 
           stroke="#0071e3" 
-          strokeWidth="3" 
+          strokeWidth="1" 
           strokeLinecap="round" 
-          fill="none" 
+          strokeDasharray="5 3" 
         />
         
         {/* Robot Antenna */}
-        <line 
-          x1="250" 
-          y1="60" 
-          x2="250" 
-          y2="30" 
+        <path 
+          d="M250,60 L250,30 L255,25 L245,20 L255,15 L245,10 L250,5" 
           stroke="#0071e3" 
-          strokeWidth="3" 
+          strokeWidth="2" 
           strokeLinecap="round" 
-        />
-        <circle 
-          cx="250" 
-          cy="25" 
-          r="5" 
-          fill="#0071e3" 
-        />
-        
-        {/* Robot Body */}
-        <rect 
-          x="170" 
-          y="220" 
-          width="160" 
-          height="120" 
-          rx="15" 
-          stroke="#0071e3" 
-          strokeWidth="3" 
-          strokeLinecap="round" 
-          strokeDasharray="2 6" 
           fill="none" 
         />
         
-        {/* Robot Arms */}
-        <line 
-          x1="170" 
-          y1="250" 
-          x2="130" 
-          y2="230" 
-          stroke="#0071e3" 
-          strokeWidth="3" 
-          strokeLinecap="round" 
-          strokeDasharray="5 5" 
-        />
-        <line 
-          x1="330" 
-          y1="250" 
-          x2="370" 
-          y2="230" 
-          stroke="#0071e3" 
-          strokeWidth="3" 
-          strokeLinecap="round" 
-          strokeDasharray="5 5" 
-        />
-        
-        {/* Robot Control Panel */}
-        <rect 
-          x="205" 
-          y="240" 
-          width="90" 
-          height="40" 
-          rx="5" 
+        {/* Robot Body - more structured */}
+        <path 
+          d="M170,220 L330,220 L340,340 L160,340 Z" 
           stroke="#0071e3" 
           strokeWidth="2" 
-          fill="white" 
-          fillOpacity="0.1" 
+          fill="none" 
+        />
+        
+        {/* Robot Body Features */}
+        <rect 
+          x="210" 
+          y="240" 
+          width="80" 
+          height="30" 
+          rx="2" 
+          stroke="#0071e3" 
+          strokeWidth="1" 
+          fill="none" 
         />
         <circle 
-          cx="225" 
-          cy="260" 
-          r="8" 
+          cx="230" 
+          cy="255" 
+          r="5" 
           fill="#0071e3" 
-          fillOpacity="0.5" 
+          fillOpacity="0.6" 
         />
         <circle 
           cx="250" 
-          cy="260" 
-          r="8" 
+          cy="255" 
+          r="5" 
           fill="#0071e3" 
-          fillOpacity="0.5" 
+          fillOpacity="0.6" 
         />
         <circle 
-          cx="275" 
-          cy="260" 
-          r="8" 
+          cx="270" 
+          cy="255" 
+          r="5" 
           fill="#0071e3" 
-          fillOpacity="0.5" 
+          fillOpacity="0.6" 
         />
         
-        {/* Pencil */}
-        <g transform="translate(370, 200) rotate(45)">
+        {/* Digital Circuit Lines */}
+        <path 
+          d="M190,290 L210,290 L210,310 L230,310 L230,290 L250,290" 
+          stroke="#0071e3" 
+          strokeWidth="1" 
+          strokeLinecap="round" 
+          fill="none" 
+        />
+        <path 
+          d="M270,290 L290,290 L290,310 L310,310" 
+          stroke="#0071e3" 
+          strokeWidth="1" 
+          strokeLinecap="round" 
+          fill="none" 
+        />
+        
+        {/* Circuit Points */}
+        <circle cx="210" cy="290" r="2" fill="#0071e3" />
+        <circle cx="230" cy="290" r="2" fill="#0071e3" />
+        <circle cx="230" cy="310" r="2" fill="#0071e3" />
+        <circle cx="250" cy="290" r="2" fill="#0071e3" />
+        <circle cx="270" cy="290" r="2" fill="#0071e3" />
+        <circle cx="290" cy="290" r="2" fill="#0071e3" />
+        <circle cx="290" cy="310" r="2" fill="#0071e3" />
+        <circle cx="310" cy="310" r="2" fill="#0071e3" />
+        
+        {/* Technical Pencil - more elegant, less cartoonish */}
+        <g transform="translate(350, 150) rotate(30)">
           <rect 
             x="0" 
             y="0" 
-            width="15" 
-            height="140" 
-            fill="#f5d0a9" 
+            width="10" 
+            height="150" 
+            fill="#0071e3" 
+            fillOpacity="0.1" 
             stroke="#0071e3" 
             strokeWidth="1" 
           />
           <polygon 
-            points="0,0 15,0 7.5,-20" 
+            points="0,0 10,0 5,-15" 
             fill="#0071e3" 
             stroke="#0071e3" 
             strokeWidth="1" 
           />
           <rect 
             x="0" 
-            y="25" 
-            width="15" 
-            height="20" 
+            y="10" 
+            width="10" 
+            height="15" 
             fill="#0071e3" 
+            fillOpacity="0.3" 
             stroke="#0071e3" 
             strokeWidth="1" 
-            strokeOpacity="0.5" 
           />
         </g>
         
-        {/* Sketchy Effect Lines */}
-        <path 
-          d="M120 100 Q130 95 125 85 M380 110 Q390 105 385 95 M140 320 Q150 315 145 305 M350 300 Q360 295 355 285" 
+        {/* Technical Blueprint Lines */}
+        <line 
+          x1="120" 
+          y1="60" 
+          x2="120" 
+          y2="340" 
           stroke="#0071e3" 
-          strokeWidth="1" 
-          strokeLinecap="round" 
-          opacity="0.6" 
+          strokeWidth="0.5" 
+          strokeDasharray="5 5" 
+          opacity="0.4" 
+        />
+        <line 
+          x1="380" 
+          y1="60" 
+          x2="380" 
+          y2="340" 
+          stroke="#0071e3" 
+          strokeWidth="0.5" 
+          strokeDasharray="5 5" 
+          opacity="0.4" 
+        />
+        <line 
+          x1="150" 
+          y1="380" 
+          x2="350" 
+          y2="380" 
+          stroke="#0071e3" 
+          strokeWidth="0.5" 
+          strokeDasharray="5 5" 
+          opacity="0.4" 
         />
       </svg>
     </div>
