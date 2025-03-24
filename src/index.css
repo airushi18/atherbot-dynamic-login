@@ -1,3 +1,6 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -96,6 +99,40 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    overflow-x: hidden;
   }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg;
+  }
+  
+  .glass-input {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 focus:border-atherbot-blue/50 transition-all duration-300;
+  }
+  
+  .interactive-button {
+    @apply relative overflow-hidden transition-all duration-300 ease-out hover:shadow-md active:scale-[0.98];
+  }
+  
+  .interactive-button::after {
+    @apply content-[''] absolute top-0 left-0 w-full h-full bg-white/20 scale-x-0 transform origin-right transition-transform duration-500 ease-out;
+  }
+  
+  .interactive-button:hover::after {
+    @apply scale-x-100 origin-left;
+  }
+}
+
+.moving-gradient {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 113, 227, 0.1),
+    rgba(0, 113, 227, 0.2),
+    rgba(0, 113, 227, 0.1)
+  );
+  background-size: 500% 100%;
+  animation: shimmer 10s linear infinite;
 }
