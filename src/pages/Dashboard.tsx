@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 const apiKeys = [
   { id: "key_1", name: "Production API Key", key: "sk_prod_2eF9dKlGh56jKlMn7zX8vB4c5D6eF7gH", createdAt: "2023-06-15T10:30:00Z", lastUsed: "2023-08-20T14:45:20Z" },
@@ -40,19 +39,16 @@ const Dashboard = () => {
   };
 
   const handleDeleteKey = (keyId: string) => {
-    // This would be where you'd call your API to delete the key
     console.log(`Delete key ${keyId}`);
     toast.success("API key has been deleted");
   };
 
   const handleUploadFile = () => {
-    // This would handle the file upload
     console.log("File would be uploaded here");
     toast.success("File uploaded successfully");
   };
 
   const handleCreateApiKey = () => {
-    // This would create a new API key
     console.log("New API key would be created here");
     toast.success("New API key has been created");
   };
