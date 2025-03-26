@@ -1,33 +1,77 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Bot, Copy, Eye, EyeOff, Key, Plus, RefreshCw, Shield, Trash2, Upload } from 'lucide-react';
+import { Bot, Copy, Eye, EyeOff, Key, Plus, RefreshCw, Shield, Trash2 } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
-import { toast } from "sonner";
-
-const apiKeys = [
-  { id: "key_1", name: "Production API Key", key: "sk_prod_2eF9dKlGh56jKlMn7zX8vB4c5D6eF7gH", createdAt: "2023-06-15T10:30:00Z", lastUsed: "2023-08-20T14:45:20Z" },
-  { id: "key_2", name: "Development API Key", key: "sk_dev_8gF7dHeL56mKnJ9pQ1rS2tU3vW4xY5zZ", createdAt: "2023-07-22T08:15:30Z", lastUsed: "2023-08-19T11:20:10Z" },
-  { id: "key_3", name: "Testing API Key", key: "sk_test_3jK4lMnO5pQrS6tUvW7xYzA1bC2dE3fG", createdAt: "2023-08-05T16:40:00Z", lastUsed: "2023-08-18T09:10:45Z" },
-];
-
-const knowledgeBase = [
-  { id: "kb_1", name: "Product Documentation", size: "2.4 MB", format: "PDF", status: "processed", uploadDate: "2023-07-10T09:20:30Z" },
-  { id: "kb_2", name: "Customer FAQ", size: "1.1 MB", format: "DOCX", status: "processing", uploadDate: "2023-08-18T14:30:10Z" },
-  { id: "kb_3", name: "Technical Specifications", size: "5.7 MB", format: "PDF", status: "processed", uploadDate: "2023-08-15T11:45:20Z" },
-  { id: "kb_4", name: "User Manuals", size: "8.2 MB", format: "PDF", status: "error", uploadDate: "2023-08-17T16:15:40Z" },
-];
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { getApiKeys, createApiKey, deleteApiKey, getApiRequests, getApiUsageStats, ApiKey, ApiRequest } from '@/services/apiKeyService';
 
 const Dashboard = () => {
+  const { toast } = useToast();
+  const { user, isLoading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [showKey, setShowKey] = useState<Record<string, boolean>>({});
   const [selectedTab, setSelectedTab] = useState("overview");
+  const [isLoading, setIsLoading] = useState(true);
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+  const [showNewKeyDialog, setShowNewKeyDialog] = useState(false);
+  const [newKeyName, setNewKeyName] = useState('');
+  const [recentRequests, setRecentRequests] = useState<ApiRequest[]>([]);
+  const [usageStats, setUsageStats] = useState({
+    totalRequests: 0,
+    totalTokens: 0
+  });
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/login');
+    }
+  }, [user, authLoading, navigate]);
+
+  // Load data
+  useEffect(() => {
+    if (!user) return;
+    
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Load API keys
+        const keys = await getApiKeys();
+        setApiKeys(keys);
+        
+        // Load usage stats
+        const stats = await getApiUsageStats('month');
+        setUsageStats({
+          totalRequests: stats.totalRequests,
+          totalTokens: stats.totalTokens
+        });
+        setRecentRequests(stats.recentRequests);
+      } catch (error: any) {
+        console.error('Error loading data:', error);
+        toast({
+          title: 'Error loading data',
+          description: error.message || 'An unexpected error occurred',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadData();
+  }, [user, toast]);
 
   const toggleKeyVisibility = (keyId: string) => {
     setShowKey(prev => ({ ...prev, [keyId]: !prev[keyId] }));
@@ -38,19 +82,53 @@ const Dashboard = () => {
     toast.success("API key copied to clipboard");
   };
 
-  const handleDeleteKey = (keyId: string) => {
-    console.log(`Delete key ${keyId}`);
-    toast.success("API key has been deleted");
+  const handleDeleteKey = async (keyId: string) => {
+    try {
+      await deleteApiKey(keyId);
+      setApiKeys(apiKeys.filter(key => key.id !== keyId));
+      toast({
+        title: 'API key deleted',
+        description: 'Your API key has been deleted successfully',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error deleting API key',
+        description: error.message || 'An error occurred while deleting your API key',
+        variant: 'destructive',
+      });
+    }
   };
 
-  const handleUploadFile = () => {
-    console.log("File would be uploaded here");
-    toast.success("File uploaded successfully");
-  };
-
-  const handleCreateApiKey = () => {
-    console.log("New API key would be created here");
-    toast.success("New API key has been created");
+  const handleCreateApiKey = async () => {
+    if (!newKeyName) {
+      toast({
+        title: 'Please provide a name',
+        description: 'You need to provide a name for your API key',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    try {
+      const newKey = await createApiKey(newKeyName);
+      setApiKeys([newKey, ...apiKeys]);
+      setShowNewKeyDialog(false);
+      setNewKeyName('');
+      
+      // Show the full key
+      setShowKey({ ...showKey, [newKey.id]: true });
+      
+      toast({
+        title: 'API key created',
+        description: 'Your new API key has been generated successfully',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error creating API key',
+        description: error.message || 'An error occurred while creating your API key',
+        variant: 'destructive',
+      });
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -64,18 +142,27 @@ const Dashboard = () => {
     }).format(date);
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'processed':
-        return <Badge className="bg-green-500">Processed</Badge>;
-      case 'processing':
-        return <Badge className="bg-blue-500">Processing</Badge>;
-      case 'error':
-        return <Badge className="bg-red-500">Error</Badge>;
-      default:
-        return <Badge>Unknown</Badge>;
+  const getStatusBadge = (status: number) => {
+    if (status >= 200 && status < 300) {
+      return <Badge className="bg-green-500">Success</Badge>;
+    } else if (status >= 400 && status < 500) {
+      return <Badge className="bg-yellow-500">Client Error</Badge>;
+    } else if (status >= 500) {
+      return <Badge className="bg-red-500">Server Error</Badge>;
+    } else {
+      return <Badge>Status {status}</Badge>;
     }
   };
+
+  if (authLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-full">
+          <div>Loading...</div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -83,7 +170,7 @@ const Dashboard = () => {
         <div className="flex items-center justify-between space-y-2">
           <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
           <div className="flex items-center space-x-2">
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => window.location.reload()}>
               <RefreshCw className="mr-2 h-4 w-4" />
               Refresh
             </Button>
@@ -94,7 +181,6 @@ const Dashboard = () => {
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="api-keys">API Keys</TabsTrigger>
-            <TabsTrigger value="knowledge-base">Knowledge Base</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview" className="space-y-4">
@@ -116,9 +202,9 @@ const Dashboard = () => {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">2,345</div>
+                  <div className="text-2xl font-bold">{usageStats.totalRequests.toLocaleString()}</div>
                   <p className="text-xs text-muted-foreground">
-                    +12.5% from last month
+                    This month
                   </p>
                 </CardContent>
               </Card>
@@ -131,22 +217,22 @@ const Dashboard = () => {
                   <Key className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">3</div>
+                  <div className="text-2xl font-bold">{apiKeys.length}</div>
                   <p className="text-xs text-muted-foreground">
-                    +1 created this month
+                    {apiKeys.length > 0 ? 'Manage in API Keys tab' : 'Create one in API Keys tab'}
                   </p>
                 </CardContent>
               </Card>
               
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Knowledge Base Files</CardTitle>
-                  <Upload className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium">Total Tokens Used</CardTitle>
+                  <Bot className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">4</div>
+                  <div className="text-2xl font-bold">{usageStats.totalTokens.toLocaleString()}</div>
                   <p className="text-xs text-muted-foreground">
-                    17.4 MB total size
+                    This month
                   </p>
                 </CardContent>
               </Card>
@@ -159,36 +245,33 @@ const Dashboard = () => {
                   <CardDescription>Your recent API activity</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center">
-                      <div className="ml-4 space-y-1">
-                        <p className="text-sm font-medium leading-none">GET /api/v1/chat/completions</p>
-                        <p className="text-sm text-muted-foreground">Today at 2:34 PM</p>
-                      </div>
-                      <div className="ml-auto font-medium">200 OK</div>
+                  {isLoading ? (
+                    <div className="text-center py-8">Loading...</div>
+                  ) : recentRequests.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Bot className="mx-auto h-12 w-12 opacity-20 mb-2" />
+                      <p>No API requests yet</p>
+                      <p className="text-sm mt-1">Start using your API to see activity here</p>
                     </div>
-                    <div className="flex items-center">
-                      <div className="ml-4 space-y-1">
-                        <p className="text-sm font-medium leading-none">POST /api/v1/embeddings</p>
-                        <p className="text-sm text-muted-foreground">Today at 1:15 PM</p>
-                      </div>
-                      <div className="ml-auto font-medium">200 OK</div>
+                  ) : (
+                    <div className="space-y-4">
+                      {recentRequests.map((request) => (
+                        <div key={request.id} className="flex items-center">
+                          <div className="ml-4 space-y-1">
+                            <p className="text-sm font-medium leading-none">
+                              {request.method} {request.endpoint}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {formatDate(request.created_at)}
+                            </p>
+                          </div>
+                          <div className="ml-auto">
+                            {getStatusBadge(request.status)}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <div className="flex items-center">
-                      <div className="ml-4 space-y-1">
-                        <p className="text-sm font-medium leading-none">GET /api/v1/models</p>
-                        <p className="text-sm text-muted-foreground">Today at 11:42 AM</p>
-                      </div>
-                      <div className="ml-auto font-medium">200 OK</div>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="ml-4 space-y-1">
-                        <p className="text-sm font-medium leading-none">POST /api/v1/chat/completions</p>
-                        <p className="text-sm text-muted-foreground">Yesterday at 4:30 PM</p>
-                      </div>
-                      <div className="ml-auto font-medium">200 OK</div>
-                    </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
               
@@ -203,33 +286,22 @@ const Dashboard = () => {
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center">
                           <Bot className="h-4 w-4 mr-2" />
-                          <span>Chat Completions</span>
+                          <span>API Requests</span>
                         </div>
-                        <span>1,245 / 5,000</span>
+                        <span>{usageStats.totalRequests.toLocaleString()} / 5,000</span>
                       </div>
-                      <Progress value={25} />
+                      <Progress value={Math.min((usageStats.totalRequests / 5000) * 100, 100)} />
                     </div>
                     
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center">
                           <Shield className="h-4 w-4 mr-2" />
-                          <span>Embeddings</span>
+                          <span>Tokens Used</span>
                         </div>
-                        <span>890 / 10,000</span>
+                        <span>{usageStats.totalTokens.toLocaleString()} / 1,000,000</span>
                       </div>
-                      <Progress value={9} />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center">
-                          <Bot className="h-4 w-4 mr-2" />
-                          <span>Knowledge Base Queries</span>
-                        </div>
-                        <span>210 / 1,000</span>
-                      </div>
-                      <Progress value={21} />
+                      <Progress value={Math.min((usageStats.totalTokens / 1000000) * 100, 100)} />
                     </div>
                   </div>
                 </CardContent>
@@ -244,7 +316,7 @@ const Dashboard = () => {
                   <CardTitle>API Keys</CardTitle>
                   <CardDescription>Manage your API keys</CardDescription>
                 </div>
-                <Dialog>
+                <Dialog open={showNewKeyDialog} onOpenChange={setShowNewKeyDialog}>
                   <DialogTrigger asChild>
                     <Button>
                       <Plus className="mr-2 h-4 w-4" />
@@ -265,12 +337,17 @@ const Dashboard = () => {
                         </Label>
                         <Input
                           id="key-name"
+                          value={newKeyName}
+                          onChange={(e) => setNewKeyName(e.target.value)}
                           placeholder="e.g. Production API Key"
                           className="col-span-3"
                         />
                       </div>
                     </div>
                     <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowNewKeyDialog(false)}>
+                        Cancel
+                      </Button>
                       <Button onClick={handleCreateApiKey}>Create Key</Button>
                     </DialogFooter>
                   </DialogContent>
@@ -278,119 +355,63 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[400px]">
-                  <div className="space-y-4">
-                    {apiKeys.map((apiKey) => (
-                      <div key={apiKey.id} className="rounded-lg border p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-medium">{apiKey.name}</h3>
-                            <div className="mt-1 flex items-center">
-                              <div className="text-sm text-muted-foreground font-mono flex items-center max-w-[300px] overflow-hidden">
-                                {showKey[apiKey.id] ? (
-                                  apiKey.key
-                                ) : (
-                                  `${apiKey.key.substring(0, 8)}...${apiKey.key.substring(apiKey.key.length - 4)}`
-                                )}
-                              </div>
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                onClick={() => toggleKeyVisibility(apiKey.id)}
-                                className="ml-2"
-                              >
-                                {showKey[apiKey.id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                onClick={() => copyApiKey(apiKey.key)}
-                                className="ml-2"
-                              >
-                                <Copy className="h-4 w-4" />
-                              </Button>
-                            </div>
-                            <div className="mt-1 text-xs text-muted-foreground">
-                              Created: {formatDate(apiKey.createdAt)} • Last used: {formatDate(apiKey.lastUsed)}
-                            </div>
-                          </div>
-                          <Button 
-                            variant="destructive" 
-                            size="icon"
-                            onClick={() => handleDeleteKey(apiKey.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="knowledge-base" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Knowledge Base</CardTitle>
-                  <CardDescription>Train your AI on your own data</CardDescription>
-                </div>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Upload className="mr-2 h-4 w-4" />
-                      Upload Files
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Upload Knowledge Base Files</DialogTitle>
-                      <DialogDescription>
-                        Upload documents to train your AI model.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor="file-upload">Select files</Label>
-                        <Input id="file-upload" type="file" multiple />
-                      </div>
+                  {isLoading ? (
+                    <div className="text-center py-8">Loading...</div>
+                  ) : apiKeys.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Key className="mx-auto h-12 w-12 opacity-20 mb-2" />
+                      <p>You don't have any API keys yet</p>
+                      <p className="text-sm mt-1">Create one to start using the API</p>
                     </div>
-                    <DialogFooter>
-                      <Button onClick={handleUploadFile}>Upload</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[400px]">
-                  <div className="space-y-4">
-                    {knowledgeBase.map((file) => (
-                      <div key={file.id} className="rounded-lg border p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-medium">{file.name}</h3>
-                            <div className="mt-1 flex items-center">
-                              <Badge variant="outline">{file.format}</Badge>
-                              <span className="ml-2 text-xs text-muted-foreground">{file.size}</span>
-                              <div className="ml-2">
-                                {getStatusBadge(file.status)}
+                  ) : (
+                    <div className="space-y-4">
+                      {apiKeys.map((apiKey) => (
+                        <div key={apiKey.id} className="rounded-lg border p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className="font-medium">{apiKey.name}</h3>
+                              <div className="mt-1 flex items-center">
+                                <div className="text-sm text-muted-foreground font-mono flex items-center max-w-[300px] overflow-hidden">
+                                  {showKey[apiKey.id] ? (
+                                    apiKey.key
+                                  ) : (
+                                    `${apiKey.key.substring(0, 8)}...${apiKey.key.substring(apiKey.key.length - 4)}`
+                                  )}
+                                </div>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  onClick={() => toggleKeyVisibility(apiKey.id)}
+                                  className="ml-2"
+                                >
+                                  {showKey[apiKey.id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  onClick={() => copyApiKey(apiKey.key)}
+                                  className="ml-2"
+                                >
+                                  <Copy className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              <div className="mt-1 text-xs text-muted-foreground">
+                                Created: {formatDate(apiKey.created_at)}
+                                {apiKey.last_used_at && ` • Last used: ${formatDate(apiKey.last_used_at)}`}
                               </div>
                             </div>
-                            <div className="mt-1 text-xs text-muted-foreground">
-                              Uploaded: {formatDate(file.uploadDate)}
-                            </div>
+                            <Button 
+                              variant="destructive" 
+                              size="icon"
+                              onClick={() => handleDeleteKey(apiKey.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           </div>
-                          <Button 
-                            variant="destructive" 
-                            size="icon"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </ScrollArea>
               </CardContent>
             </Card>

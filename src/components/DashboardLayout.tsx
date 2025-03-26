@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Bot, LayoutDashboard, Key, FileText, Settings, ChevronLeft, ChevronRight, LogOut, Menu } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -13,6 +14,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
   
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -40,6 +43,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       icon: Settings,
     },
   ];
+  
+  const handleLogout = async () => {
+    await signOut();
+  };
   
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">
@@ -108,7 +115,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         </div>
         
         <div className="p-4 border-t mt-auto">
-          <Button variant="ghost" className={cn("w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50", collapsed && "justify-center")}>
+          <Button 
+            variant="ghost" 
+            className={cn(
+              "w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50", 
+              collapsed && "justify-center"
+            )}
+            onClick={handleLogout}
+          >
             <LogOut className="h-5 w-5 mr-2" />
             {!collapsed && "Logout"}
           </Button>
