@@ -79,7 +79,11 @@ const Dashboard = () => {
 
   const copyApiKey = (key: string) => {
     navigator.clipboard.writeText(key);
-    toast.success("API key copied to clipboard");
+    // Fixed toast call here - using the correct method
+    toast({
+      title: "API key copied",
+      description: "API key copied to clipboard",
+    });
   };
 
   const handleDeleteKey = async (keyId: string) => {

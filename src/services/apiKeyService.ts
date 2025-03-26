@@ -33,6 +33,10 @@ export const getApiKeys = async (): Promise<ApiKey[]> => {
 
 // Create a new API key
 export const createApiKey = async (name: string, prefix: string = 'ather'): Promise<ApiKey> => {
+  // Get the current user ID
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+  
   // Use the database function to generate a secure key
   const { data: keyData, error: keyError } = await supabase
     .rpc('generate_api_key', { prefix });
@@ -44,7 +48,11 @@ export const createApiKey = async (name: string, prefix: string = 'ather'): Prom
   // Insert the new key into the database
   const { data, error } = await supabase
     .from('api_keys')
-    .insert([{ name, key }])
+    .insert({ 
+      name, 
+      key,
+      user_id: user.id 
+    })
     .select()
     .single();
   
