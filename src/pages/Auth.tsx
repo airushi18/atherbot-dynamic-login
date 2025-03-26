@@ -90,12 +90,41 @@ const Auth = () => {
     
     try {
       setIsLoading(true);
-      // Sign up without email confirmation
-      const { error, data } = await supabase.auth.signUp({
+      
+      // First, check if the user already exists
+      const { data: { users }, error: getUserError } = await supabase.auth.admin.listUsers({
+        filter: {
+          email: email
+        }
+      }).catch(() => ({ data: { users: [] }, error: null }));
+      
+      if (getUserError) {
+        console.log("Error checking existing user:", getUserError);
+      }
+      
+      // If the user exists but isn't confirmed, delete the user first
+      if (users && users.length > 0) {
+        // User exists, try sign in directly
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (!signInError) {
+          // Sign in successful
+          toast({
+            title: 'Sign in successful',
+            description: 'Welcome back!',
+          });
+          return;
+        }
+      }
+      
+      // Create new user
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          // Skip email confirmation and auto-confirm the user
           emailRedirectTo: `${window.location.origin}/login`,
           data: {
             email_confirmed: true
@@ -105,19 +134,25 @@ const Auth = () => {
       
       if (error) throw error;
       
-      // Since we're skipping email confirmation, immediately sign in the user
+      // Immediately sign in after signup
       if (data.user) {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         
-        if (signInError) throw signInError;
-        
-        toast({
-          title: 'Account created successfully',
-          description: 'Welcome to Ather Bot!',
-        });
+        if (signInError) {
+          console.error("Auto-signin failed after signup:", signInError);
+          toast({
+            title: 'Account created',
+            description: 'You can now sign in with your credentials',
+          });
+        } else {
+          toast({
+            title: 'Account created successfully',
+            description: 'Welcome to Ather Bot!',
+          });
+        }
       }
     } catch (error: any) {
       toast({
