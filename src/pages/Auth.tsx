@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -91,36 +90,22 @@ const Auth = () => {
     try {
       setIsLoading(true);
       
-      // First, check if the user already exists
-      const { data: { users }, error: getUserError } = await supabase.auth.admin.listUsers({
-        filter: {
-          email: email
-        }
-      }).catch(() => ({ data: { users: [] }, error: null }));
+      // First, try to sign in with the provided credentials in case user already exists
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       
-      if (getUserError) {
-        console.log("Error checking existing user:", getUserError);
-      }
-      
-      // If the user exists but isn't confirmed, delete the user first
-      if (users && users.length > 0) {
-        // User exists, try sign in directly
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+      // If sign in is successful, user already exists and credentials are correct
+      if (!signInError) {
+        toast({
+          title: 'Sign in successful',
+          description: 'Welcome back!',
         });
-        
-        if (!signInError) {
-          // Sign in successful
-          toast({
-            title: 'Sign in successful',
-            description: 'Welcome back!',
-          });
-          return;
-        }
+        return;
       }
       
-      // Create new user
+      // If sign in fails, create a new user account
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -136,13 +121,13 @@ const Auth = () => {
       
       // Immediately sign in after signup
       if (data.user) {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
+        const { error: autoSignInError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         
-        if (signInError) {
-          console.error("Auto-signin failed after signup:", signInError);
+        if (autoSignInError) {
+          console.error("Auto-signin failed after signup:", autoSignInError);
           toast({
             title: 'Account created',
             description: 'You can now sign in with your credentials',
