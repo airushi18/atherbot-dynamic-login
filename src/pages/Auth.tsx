@@ -90,17 +90,35 @@ const Auth = () => {
     
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signUp({
+      // Sign up without email confirmation
+      const { error, data } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          // Skip email confirmation and auto-confirm the user
+          emailRedirectTo: `${window.location.origin}/login`,
+          data: {
+            email_confirmed: true
+          }
+        }
       });
       
       if (error) throw error;
       
-      toast({
-        title: 'Sign up successful',
-        description: 'Please check your email to verify your account',
-      });
+      // Since we're skipping email confirmation, immediately sign in the user
+      if (data.user) {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (signInError) throw signInError;
+        
+        toast({
+          title: 'Account created successfully',
+          description: 'Welcome to Ather Bot!',
+        });
+      }
     } catch (error: any) {
       toast({
         title: 'Sign up failed',
