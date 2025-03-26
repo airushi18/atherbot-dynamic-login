@@ -17,8 +17,8 @@ const Header: React.FC = () => {
           <Link to="/docs" className="text-atherbot-gray hover:text-atherbot-dark transition-colors">
             Docs
           </Link>
-          <Link to="/api" className="text-atherbot-gray hover:text-atherbot-dark transition-colors">
-            API
+          <Link to="/try-chatbot" className="text-atherbot-gray hover:text-atherbot-dark transition-colors">
+            Try Chatbot
           </Link>
           <Link to="/settings" className="text-atherbot-gray hover:text-atherbot-dark transition-colors">
             <Settings className="h-5 w-5" />

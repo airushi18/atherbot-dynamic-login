@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Bot, LayoutDashboard, Key, FileText, Settings, ChevronLeft, ChevronRight, LogOut, Menu } from 'lucide-react';
+import { Bot, Upload, MessageSquare, FileText, Settings, ChevronLeft, ChevronRight, LogOut, Menu } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,14 +23,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   
   const navItems = [
     {
-      name: 'Dashboard',
-      path: '/dashboard',
-      icon: LayoutDashboard,
+      name: 'Upload Database',
+      path: '/upload-database',
+      icon: Upload,
     },
     {
-      name: 'API Keys',
-      path: '/api',
-      icon: Key,
+      name: 'Try Chatbot',
+      path: '/try-chatbot',
+      icon: MessageSquare,
     },
     {
       name: 'Documentation',

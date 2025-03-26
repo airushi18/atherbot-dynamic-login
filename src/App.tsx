@@ -7,8 +7,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Dashboard from "./pages/Dashboard";
-import ApiPage from "./pages/ApiPage";
+import UploadDatabase from "./pages/UploadDatabase";
+import TryChatbot from "./pages/TryChatbot";
 import Docs from "./pages/Docs";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -28,8 +28,8 @@ const App = () => (
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Auth />} />
             <Route path="/signup" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/api" element={<ApiPage />} />
+            <Route path="/upload-database" element={<UploadDatabase />} />
+            <Route path="/try-chatbot" element={<TryChatbot />} />
             <Route path="/docs/*" element={<Docs />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
